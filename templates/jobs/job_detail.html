@@ -1,0 +1,302 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{{ job.title }} - CareerConnect</title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+</head>
+
+
+<body class="bg-light">
+
+
+<!-- Navbar -->
+
+<nav class="navbar navbar-dark bg-dark">
+
+    <div class="container">
+
+        <a
+            class="navbar-brand fw-bold"
+            href="/"
+        >
+            CareerConnect
+        </a>
+
+
+        <div>
+
+            {% if user.is_authenticated %}
+
+                <span class="text-white me-3">
+                    Welcome, {{ user.username }}
+                </span>
+
+                <a
+                    href="{% url 'logout' %}"
+                    class="btn btn-outline-light"
+                >
+                    Logout
+                </a>
+
+            {% else %}
+
+                <a
+                    href="{% url 'login' %}"
+                    class="btn btn-outline-light"
+                >
+                    Login
+                </a>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</nav>
+
+
+<!-- Job Details -->
+
+<div class="container py-5">
+
+    <div class="row justify-content-center">
+
+        <div class="col-lg-9">
+
+            <div class="card shadow-sm border-0">
+
+                <div class="card-body p-5">
+
+
+                    <!-- Job Title -->
+
+                    <h1 class="fw-bold mb-2">
+                        {{ job.title }}
+                    </h1>
+
+
+                    <!-- Company -->
+
+                    <h4 class="text-primary mb-4">
+                        {{ job.company.name }}
+                    </h4>
+
+
+                    <!-- Job Information -->
+
+                    <div class="row mb-4">
+
+                        <div class="col-md-6">
+
+                            <p>
+                                <strong>📍 Location:</strong>
+                                {{ job.location }}
+                            </p>
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            <p>
+                                <strong>💼 Job Type:</strong>
+                                {{ job.job_type }}
+                            </p>
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            <p>
+                                <strong>💰 Salary:</strong>
+                                {{ job.salary|default:"Not specified" }}
+                            </p>
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            <p>
+                                <strong>📅 Posted:</strong>
+                                {{ job.created_at|date:"d M Y" }}
+                            </p>
+
+                        </div>
+                        <div class="col-md-6">
+
+    <p>
+        <strong>⏰ Application Deadline:</strong>
+
+        {% if job.deadline %}
+            {{ job.deadline|date:"d M Y" }}
+        {% else %}
+            Not specified
+        {% endif %}
+
+    </p>
+
+</div>
+
+                    </div>
+
+
+                    <hr>
+
+
+                    <!-- Description -->
+
+                    <h3 class="fw-bold mt-4">
+                        Job Description
+                    </h3>
+
+                    <p class="text-muted">
+                        {{ job.description }}
+                    </p>
+
+
+                    <!-- Skills -->
+
+                    <h3 class="fw-bold mt-4">
+                        Required Skills
+                    </h3>
+
+                    <p>
+                        {{ job.skills }}
+                    </p>
+
+
+                    <hr class="my-4">
+
+                    <!-- Save Job -->
+
+<div class="text-center mb-4">
+
+    {% if user.is_authenticated %}
+
+        {% if is_saved %}
+
+            <a
+                href="{% url 'remove_saved_job' job.id %}"
+                class="btn btn-outline-danger"
+            >
+                🔖 Remove Saved Job
+            </a>
+
+        {% else %}
+
+            <a
+                href="{% url 'save_job' job.id %}"
+                class="btn btn-outline-primary"
+            >
+                🔖 Save Job
+            </a>
+
+        {% endif %}
+
+    {% endif %}
+
+</div>
+
+
+                    <!-- Apply Section -->
+<div class="text-center">
+
+    {% if not job.is_active %}
+
+        <button
+            class="btn btn-danger btn-lg px-5"
+            disabled
+        >
+            🔒 Job Closed
+        </button>
+
+        <p class="text-muted mt-2 mb-0">
+            This job is no longer accepting applications.
+        </p>
+
+    {% elif job.deadline and job.deadline < today %}
+
+        <button
+            class="btn btn-danger btn-lg px-5"
+            disabled
+        >
+            ⏰ Deadline Passed
+        </button>
+
+        <p class="text-muted mt-2 mb-0">
+            The application deadline has passed.
+        </p>
+
+    {% elif user.is_authenticated %}
+
+        {% if already_applied %}
+
+            <button
+                class="btn btn-secondary btn-lg"
+                disabled
+            >
+                ✓ Already Applied
+            </button>
+
+        {% else %}
+
+            <a
+                href="{% url 'apply_job' job.id %}"
+                class="btn btn-success btn-lg px-5"
+            >
+                Apply Now
+            </a>
+
+        {% endif %}
+
+    {% else %}
+
+        <a
+            href="{% url 'login' %}"
+            class="btn btn-primary btn-lg px-5"
+        >
+            Login to Apply
+        </a>
+
+    {% endif %}
+
+    <a
+        href="{% url 'job_list' %}"
+        class="btn btn-outline-secondary btn-lg px-5 ms-2"
+    >
+        Back to Jobs
+    </a>
+
+</div>
+
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+</body>
+
+</html>
+
